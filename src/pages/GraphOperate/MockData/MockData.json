@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "node": "circuit(a)",
+      "properties": {
+        "name": "5 - Transistor OPAMP",
+        "load": "Current mirror",
+        "low": "",
+        "input": "Differential",
+        "output": "Single",
+        "class": "OPAMP",
+        "evaluates": "",
+        "sets": "",
+        "DM_Gain": "",
+        "CMRR": "",
+        "PSRR": "",
+        "CM_gain": ""
+      }
+    },
+    {
+      "node": "circuit(b)",
+      "properties": {
+        "name": "",
+        "load": "Cascode current mirror",
+        "low": "",
+        "input": "Differential",
+        "output": "Single",
+        "class": "OPAMP",
+        "evaluates": "",
+        "sets": "",
+        "DM_Gain": "High",
+        "CMRR": "High",
+        "PSRR": "High",
+        "CM_gain": ""
+      }
+    },
+    {
+      "node": "circuit(c)",
+      "properties": {
+        "name": "Folded Cascode OPAMP",
+        "load": "Active load",
+        "low": "",
+        "input": "Differential",
+        "output": "Single",
+        "class": "OPAMP",
+        "evaluates": "",
+        "sets": "",
+        "DM_Gain": "Very High",
+        "CMRR": "Very High",
+        "PSRR": "Very High",
+        "CM_gain": ""
+      }
+    }
+  ],
+  "links": [
+    {
+      "source": "circuit(a)",
+      "target": "circuit(b)",
+      "label": "Improvement",
+      "properties": {
+        "description": "circuit(b) is an improved version of circuit(a) with better performance in gain and rejection ratios."
+      }
+    },
+    {
+      "source": "circuit(b)",
+      "target": "circuit(c)",
+      "label": "Inspiration",
+      "properties": {
+        "description": "circuit(c) was inspired by the design of circuit(b) and further enhanced the performance."
+      }
+    },
+    {
+      "source": "circuit(a)",
+      "target": "circuit(c)",
+      "label": "Evolutionary Link",
+      "properties": {
+        "description": "There is an evolutionary path from circuit(a) to circuit(c) through intermediate improvements."
+      }
+    }
+  ]
+}

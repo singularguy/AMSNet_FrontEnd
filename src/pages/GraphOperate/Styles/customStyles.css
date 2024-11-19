@@ -1,0 +1,92 @@
+/* 全局样式设置 */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 0;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 20px auto;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 标题样式 */
+h1 {
+  color: #1890ff;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 输入组样式 */
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+/* 按钮组样式 */
+.button-group {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.button-group button {
+  margin-right: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button-group button[type="primary"] {
+  background-color: #1890ff;
+  color: white;
+}
+
+.button-group button[type="link"] {
+  background-color: transparent;
+  color: #1890ff;
+}
+
+.button-group button.danger {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+/* 节点数据显示样式 */
+.node-data {
+  margin-top: 20px;
+  background-color: #fafafa;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.node-data h2 {
+  color: #52c41a;
+  margin-top: 0;
+}
+
+.node-data pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 4px;
+}
