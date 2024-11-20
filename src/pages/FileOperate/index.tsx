@@ -718,7 +718,9 @@ const FileUpload: React.FC<FileUploadProps> = ({}) => {
           left: parseFloat(leftTopX),
           top: parseFloat(leftTopY),
           right: parseFloat(rightBottomX),
-          bottom: parseFloat(rightBottomY)
+          bottom: parseFloat(rightBottomY),
+          color: color,
+
         };
       });
       const rectUnderMouse = rects.find((rect) => isPointInRectangle(currentX, currentY, rect));
@@ -918,14 +920,13 @@ const FileUpload: React.FC<FileUploadProps> = ({}) => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         />
-        <textarea ref={textareaRef} // 这个textarea用于显示带有行号的currentYoloContent
+        <textarea ref={textareaRef} // 用于显示带有行号的currentYoloContent
                   value={addLineNumbersToYoloContent(currentYoloContent)}
                   className="custom-textarea"
         />
       </div>
       <div>
-        {/* 其他组件和按钮 */}
-        <div>{`当前类别: ${currentClassLabelToShow} (颜色: ${currentClassColorToShow})`}</div>
+        <div>{`鼠标所在区域类别: ${currentClassLabelToShow} `}</div>
       </div>
     </div>
   );
