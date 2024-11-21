@@ -1,225 +1,288 @@
-/*
- * @Author: singularguy 2635495642@qq.com
- * @Date: 2024-11-17 15:09:19
- * @LastEditors: singularguy 2635495642@qq.com
- * @LastEditTime: 2024-11-19 05:27:54
- * @FilePath: /AMSNet/src/pages/GraphOperate/index.tsx
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
-import React, { useState, useEffect } from 'react';
-import { addNode, deleteNode, updateNode, findNode } from '@/pages/GraphOperate/Components/apiFunctions';
+import React, { useEffect, useState } from 'react';
+import {
+  createNode, deleteNode, updateNode, findNode,
+  getAllNodes,
+  createRelationship, deleteRelationship, updateRelationship, findRelationship,
+  getAllRelationships
+} from '@/pages/GraphOperate/Components/apiFunctions';
 import './Styles/customStyles.css';
-import { Layout, Space, Input, Button, Typography, Card } from 'antd';
-const { Title } = Typography;
-
+import { Button, Card, Input, Layout, Space, Typography } from 'antd';
 // 导入可视化组件和数据文件
 import Neo4jVisualization from './Components/Neo4jVisualization';
 
-const mockData = {
-  "nodes": [
-    {
-      "node": "Node1",
-      "shape": "circle",
-      "properties": {
-        "name": "Amplifier 1",
-        "load": "50 Ohm",
-        "low": "0.1 V",
-        "input": "1 V",
-        "output": "10 V",
-        "class": "Amplifier",
-        "evaluates": "Gain Calculation",
-        "sets": "Output Voltage",
-        "DM_Gain": "20",
-        "CMRR": "80 dB",
-        "PSRR": "60 dB",
-        "CM_gain": "0.01"
-      }
-    },
-    {
-      "node": "Node2",
-      "shape": "circle",
-      "properties": {
-        "name": "Resistor 1",
-        "load": "100 Ohm",
-        "low": "0 V",
-        "input": "10 V",
-        "output": "0 V",
-        "class": "Amplifier",
-        "evaluates": "Voltage Drop",
-        "sets": "Current",
-        "DM_Gain": "0",
-        "CMRR": "N/A",
-        "PSRR": "N/A",
-        "CM_gain": "0"
-      }
-    },
-    {
-      "node": "Node3",
-      "shape": "circle",
-      "properties": {
-        "name": "Capacitor 1",
-        "load": "0.1 F",
-        "low": "0 V",
-        "input": "5 V",
-        "output": "5 V",
-        "class": "Capacitor",
-        "evaluates": "Charge Storage",
-        "sets": "Voltage",
-        "DM_Gain": "1",
-        "CMRR": "N/A",
-        "PSRR": "N/A",
-        "CM_gain": "0"
-      }
-    }
-  ],
-  "links": [
-    {
-      "source": "Node1",
-      "target": "Node2",
-      "label": "Connects",
-      "properties": {
-        "description": "Amplifier output is connected to resistor input"
-      }
-    },
-    {
-      "source": "Node2",
-      "target": "Node3",
-      "label": "Connects",
-      "properties": {
-        "description": "Resistor output is connected to capacitor input"
-      }
-    }
-  ]
+const { Title } = Typography;
+const { Content } = Layout;
+
+// 定义node的接口
+interface Node {
+  name: string;
+  properties: { [key: string]: any };
+}
+
+// 定义relationship的接口
+interface Relationship {
+  name: string;
+  properties: { [key: string]: any };
 }
 
 const GraphOperate = () => {
-  const [label, setLabel] = useState('DefaultLabel');
-  const [properties, setProperties] = useState({ key: 'value' });
-  const [oldProperties, setOldProperties] = useState({ oldKey: 'oldValue' });
-  const [newProperties, setNewProperties] = useState({ newKey: 'newValue' });
-  const [nodeData, setNodeData] = useState(null);
+  // 节点相关状态
+  const [name, setName] = useState('');
+  const [nodePropertiesKeys, setNodePropertiesKeys] = useState<string[]>([]);
+  const [nodePropertiesValues, setNodePropertiesValues] = useState<string[]>([]);
+  const [nodeResult, setNodeResult] = useState<Node | null>(null);
+  const [allNodes, setAllNodes] = useState<Node[]>([]);
 
-  useEffect(() => {
-    const defaultLabel = 'DefaultLabel';
-    const defaultProperties = { key: 'value' };
-    findNode(defaultLabel, defaultProperties).then(response => {
-      setNodeData(response);
-    });
-  }, []);
+  // 关系相关状态
+  const [relationshipName, setRelationshipName] = useState('');
+  const [relationshipPropertiesKeys, setRelationshipPropertiesKeys] = useState<string[]>([]);
+  const [relationshipPropertiesValues, setRelationshipPropertiesValues] = useState<string[]>([]);
+  const [relationshipResult, setRelationshipResult] = useState<Relationship | null>(null);
+  const [allRelationships, setAllRelationships] = useState<Relationship[]>([]);
 
-  const handleAddNode = async () => {
-    await addNode(label, properties);
+  // 处理节点属性键值对添加
+  const handleAddNodeProperty = () => {
+    setNodePropertiesKeys([...nodePropertiesKeys, '']);
+    setNodePropertiesValues([...nodePropertiesValues, '']);
   };
 
-  const handleDeleteNode = async () => {
-    await deleteNode(label, properties);
+  // 处理节点属性键值对更新
+  const handleUpdateNodeProperty = (index: number, key: string, value: string) => {
+    const newKeys = [...nodePropertiesKeys];
+    newKeys[index] = key;
+    setNodePropertiesKeys(newKeys);
+
+    const newValues = [...nodePropertiesValues];
+    newValues[index] = value;
+    setNodePropertiesValues(newValues);
   };
 
-  const handleUpdateNode = async () => {
-    await updateNode(label, oldProperties, newProperties);
+  // 处理关系属性键值对添加
+  const handleAddRelationshipProperty = () => {
+    setRelationshipPropertiesKeys([...relationshipPropertiesKeys, '']);
+    setRelationshipPropertiesValues([...relationshipPropertiesValues, '']);
   };
 
-  const handleFindNode = async () => {
-    const response = await findNode(label, properties);
-    setNodeData(response);
+  // 处理关系属性键值对更新
+  const handleUpdateRelationshipProperty = (index: number, key: string, value: string) => {
+    const newKeys = [...relationshipPropertiesKeys];
+    newKeys[index] = key;
+    setRelationshipPropertiesKeys(newKeys);
+
+    const newValues = [...relationshipPropertiesValues];
+    newValues[index] = value;
+    setRelationshipPropertiesValues(newValues);
   };
 
-  // 将原始数据处理后
-  const parseData = (circuitData: { nodes: CircuitNode[]; links: Link[] }) => {
-    const newNodes: CircuitNode[] = [...circuitData.nodes];
-    const newLinks: Link[] = [...circuitData.links];
-    const nodeMap: { [key: string]: CircuitNode } = {};
-
-    // 构建节点映射
-    circuitData.nodes.forEach((node) => {
-      nodeMap[node.node] = node;
-    });
-
-    // 查找具有相同class的节点对并添加新节点和连接
-    for (let i = 0; i < circuitData.nodes.length; i++) {
-      for (let j = i + 1; j < circuitData.nodes.length; j++) {
-        const node1 = circuitData.nodes[i];
-        const node2 = circuitData.nodes[j];
-        if (node1.properties.class === node2.properties.class) {
-          const newNode: CircuitNode = {
-            node: `Node${newNodes.length + 1}`,
-            shape: 'rect',
-            properties: {
-              name: `properties.class`,
-            }
-          };
-          newNodes.push(newNode);
-
-          const link1: Link = {
-            source: node1.node,
-            target: newNode.node,
-            label: node1.properties.class,
-            properties: {
-              description: ''
-            }
-          };
-          newLinks.push(link1);
-
-          const link2: Link = {
-            source: node2.node,
-            target: newNode.node,
-            label: node2.properties.class,
-            properties: {
-              description: ''
-            }
-          };
-          newLinks.push(link2);
-        }
-      }
+  // 创建节点
+  const handleCreateNode = async () => {
+    try {
+      const propertiesObj: { [key: string]: any } = {};
+      nodePropertiesKeys.forEach((key, index) => {
+        propertiesObj[key] = nodePropertiesValues[index];
+      });
+      const newNode: Node = { name, properties: propertiesObj };
+      await createNode(newNode.name, newNode.properties);
+      setNodeResult(newNode);
+    } catch (error) {
+      setNodeResult({ name: '', properties: {} } as Node);
+      setNodeResult(`节点创建失败: ${error.message}`);
     }
-    console.log(newNodes);
-    console.log(newLinks);
+  };
 
-    return { nodes: newNodes, links: newLinks };
+  // 删除节点
+  const handleDeleteNode = async () => {
+    try {
+      await deleteNode(name);
+      setNodeResult({ name: '', properties: {} } as Node);
+      setNodeResult('节点删除成功');
+    } catch (error) {
+      setNodeResult({ name: '', properties: {} } as Node);
+      setNodeResult(`节点删除失败: ${error.message}`);
+    }
+  };
+
+  // 更新节点
+  const handleUpdateNode = async () => {
+    try {
+      const newPropertiesObj: { [key: string]: any } = {};
+      nodePropertiesKeys.forEach((key, index) => {
+        newPropertiesObj[key] = nodePropertiesValues[index];
+      });
+      const updatedNode: Node = { name, properties: newPropertiesObj };
+      await updateNode(updatedNode.name, updatedNode.properties);
+      setNodeResult(updatedNode);
+    } catch (error) {
+      setNodeResult({ name: '', properties: {} } as Node);
+      setNodeResult(`节点更新失败: ${error.message}`);
+    }
+  };
+
+  // 查找节点
+  const handleFindNode = async () => {
+    try {
+      const result: Node = await findNode(name);
+      setNodeResult(result);
+    } catch (error) {
+      setNodeResult({ name: '', properties: {} } as Node);
+      setNodeResult(`节点查找失败: ${error.message}`);
+    }
+  };
+
+  // 获取所有节点
+  const handleGetAllNodes = async () => {
+    try {
+      const result: Node[] = await getAllNodes(false);
+      setAllNodes(result);
+    } catch (error) {
+      setNodeResult({ name: '', properties: {} } as Node);
+      setNodeResult(`获取所有节点失败: ${error.message}`);
+    }
+  };
+
+  // 创建关系
+  const handleCreateRelationship = async () => {
+    try {
+      const propertiesObj: { [key: string]: any } = {};
+      relationshipPropertiesKeys.forEach((key, index) => {
+        propertiesObj[key] = relationshipPropertiesValues[index];
+      });
+      const newRelationship: Relationship = { name: relationshipName, properties: propertiesObj };
+      await createRelationship(newRelationship.name, newRelationship.properties);
+      setRelationshipResult(newRelationship);
+    } catch (error) {
+      setRelationshipResult({ name: '', properties: {} } as Relationship);
+      setRelationshipResult(`关系创建失败: ${error.message}`);
+    }
+  };
+
+  // 删除关系
+  const handleDeleteRelationship = async () => {
+    try {
+      await deleteRelationship(relationshipName);
+      setRelationshipResult({ name: '', properties: {} } as Relationship);
+      setRelationshipResult('关系删除成功');
+    } catch (error) {
+      setRelationshipResult({ name: '', properties: {} } as Relationship);
+      setRelationshipResult(`关系删除失败: ${error.message}`);
+    }
+  };
+
+  // 更新关系
+  const handleUpdateRelationship = async () => {
+    try {
+      const propertiesObj: { [key: string]: any } = {};
+      relationshipPropertiesKeys.forEach((key, index) => {
+        propertiesObj[key] = relationshipPropertiesValues[index];
+      });
+      const updatedRelationship: Relationship = { name: relationshipName, properties: propertiesObj };
+      await updateRelationship(updatedRelationship.name, updatedRelationship.properties);
+      setRelationshipResult(updatedRelationship);
+    } catch (error) {
+      setRelationshipResult({ name: '', properties: {} } as Relationship);
+      setRelationshipResult(`关系更新失败: ${error.message}`);
+    }
+  };
+
+  // 查找关系
+  const handleFindRelationship = async () => {
+    try {
+      const result: Relationship = await findRelationship(relationshipName);
+      setRelationshipResult(result);
+    } catch (error) {
+      setRelationshipResult({ name: '', properties: {} } as Relationship);
+      setRelationshipResult(`关系查找失败: ${error.message}`);
+    }
+  };
+
+  // 获取所有关系
+  const handleGetAllRelationships = async () => {
+    try {
+      const result: Relationship[] = await getAllRelationships(false);
+      setAllRelationships(result);
+    } catch (error) {
+      setRelationshipResult({ name: '', properties: {} } as Relationship);
+      setRelationshipResult(`获取所有关系失败: ${error.message}`);
+    }
   };
 
   return (
     <Layout>
-      <Layout.Content>
-        <div className="GraphOperate-container">
-          <Title level={1}>Neo4j CRUD Interface</Title>
-          <Space direction="vertical" size={16}>
-            <div className="input-group">
-              <label>Label:</label>
-              <Input value={label} onChange={(e) => setLabel(e.target.value)} />
+      <Content>
+        <Title level={2}>节点CRUD操作</Title>
+        <Card>
+          <Space direction="vertical">
+            <Input
+              placeholder="节点名称"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <div>
+              {nodePropertiesKeys.map((key, index) => (
+                <div key={index} style={{ display: 'flex', marginBottom: '5px' }}>
+                  <Input
+                    placeholder="Key"
+                    value={key}
+                    onChange={(e) => handleUpdateNodeProperty(index, e.target.value, nodePropertiesValues[index])}
+                  />
+                  <Input
+                    placeholder="Value"
+                    value={nodePropertiesValues[index]}
+                    onChange={(e) => handleUpdateNodeProperty(index, nodePropertiesKeys[index], e.target.value)}
+                  />
+                </div>
+              ))}
+              <Button type="link" onClick={handleAddNodeProperty}>添加节点属性</Button>
             </div>
-            <div className="input-group">
-              <label>Properties (JSON):</label>
-              <textarea value={JSON.stringify(properties)} onChange={(e) => setProperties(JSON.parse(e.target.value))} />
-            </div>
-            <div className="input-group">
-              <label>Old Properties (JSON):</label>
-              <textarea value={JSON.stringify(oldProperties)} onChange={(e) => setOldProperties(JSON.parse(e.target.value))} />
-            </div>
-            <div className="input-group">
-              <label>New Properties (JSON):</label>
-              <textarea value={JSON.stringify(newProperties)} onChange={(e) => setNewProperties(JSON.parse(e.target.value))} />
-            </div>
-            <Space>
-              <Button type="primary" onClick={handleAddNode}>Add Node</Button>
-              <Button danger onClick={handleDeleteNode}>Delete Node</Button>
-              <Button type="link" onClick={handleUpdateNode}>Update Node</Button>
-              <Button type="link" onClick={handleFindNode}>Find Node</Button>
-            </Space>
+            <Button type="primary" onClick={handleCreateNode}>创建节点</Button>
+            <Button type="danger" onClick={handleDeleteNode}>删除节点</Button>
+            <Button type="link" onClick={handleUpdateNode}>更新节点</Button>
+            <Button type="link" onClick={handleFindNode}>查找节点</Button>
+            <Button type="link" onClick={handleGetAllNodes}>获取所有节点</Button>
           </Space>
-          {nodeData && (
-            <Card title="Found Node">
-              <pre>{JSON.stringify(nodeData, null, 2)}</pre>
-            </Card>
-          )}
-          {/* 展示可视化组件 */}
-          <div>
-            <h1>Circuit Visualization</h1>
-            {/*<Neo4jVisualization circuitData={mockData} />*/}
-            <Neo4jVisualization circuitData={parseData(mockData)} />
-          </div>
+          {/*<Typography.Text>{nodeResult && nodeResult.name? `节点名称: ${nodeResult.name}, 属性: `${JSON.stringify(nodeResult.properties)}` : nodeResult}</Typography.Text>*/}
+          {/*<Typography.Text>{allNodes.map((node) => `节点名称: ${node.name}, 属性: ${JSON.stringify(node.properties)}`)}</Typography.Text>*/}
+        </Card>
+
+        <Title level={2}>关系CRUD操作</Title>
+        <Card>
+          <Space direction="vertical">
+            <Input
+              placeholder="关系名称"
+              value={relationshipName}
+              onChange={(e) => setRelationshipName(e.target.value)}
+            />
+            <div>
+              {relationshipPropertiesKeys.map((key, index) => (
+                <div key={index} style={{ display: 'flex', marginBottom: '5px' }}>
+                  <Input
+                    placeholder="Key"
+                    value={key}
+                    onChange={(e) => handleUpdateRelationshipProperty(index, e.target.value, relationshipPropertiesValues[index])}
+                  />
+                  <Input
+                    placeholder="Value"
+                    value={relationshipPropertiesValues[index]}
+                    onChange={(e) => handleUpdateRelationshipProperty(index, relationshipPropertiesKeys[index], e.target.value)}
+                  />
+                </div>
+              ))}
+              <Button type="link" onClick={handleAddRelationshipProperty}>添加关系属性</Button>
+            </div>
+            <Button type="primary" onClick={handleCreateRelationship}>创建关系</Button>
+            <Button type="danger" onClick={handleDeleteRelationship}>删除关系</Button>
+            <Button type="link" onClick={handleUpdateRelationship}>更新关系</Button>
+            <Button type="link" onClick={handleFindRelationship}>查找关系</Button>
+            <Button type="link" onClick={handleGetAllRelationships}>获取所有关系</Button>
+          </Space>
+          {/*<Typography.Text>{relationshipResult && relationshipResult.name? `关系名称: ${relationshipResult.name}, 属性: ${JSON.stringify(relationshipResult.properties)}` : relationshipResult}</Typography.Text>*/}
+          {/*<Typography.Text>{allRelationships.map((relationship) => `关系名称: ${relationship.name}, 属性: ${JSON.stringify(relationship.properties)}`)}</Typography.Text>*/}
+
+        </Card>
+        <div>
+          <Neo4jVisualization nodes={allNodes} relationships={allRelationships} />
         </div>
-      </Layout.Content>
+      </Content>
     </Layout>
   );
 };

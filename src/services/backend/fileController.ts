@@ -2,6 +2,18 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
+/** save POST /api/file/save */
+export async function saveUsingPost(body: API.SaveFileRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseString_>('/api/file/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** uploadFile POST /api/file/upload */
 export async function uploadFileUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

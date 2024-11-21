@@ -38,7 +38,7 @@ export const requestConfig: RequestConfig = {
       // 响应
       const { data } = response as unknown as ResponseStructure;
       if (!data) {
-        throw new Error('服务异常');
+        throw new Error('服务异常，无返回值');
       }
 
       // 错误码处理
@@ -54,9 +54,9 @@ export const requestConfig: RequestConfig = {
         throw new Error('请先登录');
       }
 
-      if (code !== 0) {
-        throw new Error(data.message ?? '服务器错误');
-      }
+      // if (code !== 0) {
+      //   throw new Error(data.message ?? '服务器错误');
+      // }
       return response;
     },
   ],

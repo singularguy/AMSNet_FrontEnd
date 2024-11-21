@@ -1,7 +1,7 @@
 interface CircuitNode {
-    node: string;
+    name: string;
+    shape: string;
     properties: {
-        name: string;
         load: string;
         low: string;
         input: string;
@@ -16,30 +16,12 @@ interface CircuitNode {
     };
 }
 
-// 表示非原始节点 是解析出来的
-interface ParsedNode {
-    node: string;
-    properties: {
-        name: string
-    }
-}
-
 // 定义链路数据的接口类型
 interface Link {
     source: string;
     target: string;
-    label: string;
     properties: {
-        description: string;
+        label: string;
     };
 }
 
-// 表示非原始链路 是解析出来的
-interface ParsedLink {
-    source: string;
-    target: string;
-    label: string;
-    properties: {
-        description: string;
-    };
-}
